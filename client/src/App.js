@@ -1,24 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import useDarkMode from './hooks/useDarkMode';
+import axios from 'axios';
+import Data from './components/Data';
 
 function App() {
+
+  const [players, setPlayers] = useState([]);
+  const [darkMode, setDarkMode] = useDarkMode(false);
+
+  const toggleMode = event => {
+    event.preventDefault();
+    setDarkMode(!darkMode);
+  };
+
+  useEffect(() =>
+    axios.get("http://localhost:5000/api/players")
+      .then(response => {
+        console.log(response.data)
+        setPlayers(response.data)
+      })
+      .catch(error => {
+        console.log("Error: ", error)
+      }), [])
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div className="dark-mode__toggle">
+          <button
+            className="dark-button"
+            onClick={toggleMode}
+            className={darkMode ? 'toggle toggled' : 'toggle'}
+          >Dark Mode</button>
+        </div>
+        <h1>Women's World Cup data trends</h1>
       </header>
+      <div>
+        <Data players={players} />
+      </div>
     </div>
   );
 }
